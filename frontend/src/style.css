@@ -1,0 +1,282 @@
+/* ===================================================
+   全站 CSS 變數 & 主題系統 (Dark / Light Mode)
+   =================================================== */
+
+/* 預設：深色模式 */
+:root {
+  --font-family: 'Inter', system-ui, -apple-system, sans-serif;
+
+  /* 背景 */
+  --bg-color: #0f172a;
+  --surface-color: #1e293b;
+  --surface-hover: #334155;
+
+  /* 主色調 */
+  --primary: #38bdf8;
+  --primary-hover: #0ea5e9;
+  --accent: #8b5cf6;
+
+  /* 文字 */
+  --text-main: #f8fafc;
+  --text-muted: #94a3b8;
+
+  /* 功能色 */
+  --success: #10b981;
+  --danger: #ef4444;
+  --warning: #f59e0b;
+
+  /* 框線 & 輸入框 */
+  --border-color: rgba(255, 255, 255, 0.1);
+  --input-bg: rgba(15, 23, 42, 0.5);
+
+  /* 表格 */
+  --table-header-bg: rgba(0, 0, 0, 0.3);
+  --table-row-hover: rgba(255, 255, 255, 0.04);
+  --table-row-border: rgba(255, 255, 255, 0.05);
+
+  /* 導覽列 */
+  --navbar-bg: rgba(30, 41, 59, 0.9);
+  --nav-link-color: #94a3b8;
+  --nav-link-active: #f8fafc;
+
+  /* Modal 遮罩 */
+  --overlay-bg: rgba(0, 0, 0, 0.7);
+}
+
+/* 光亮模式（掛在 html 元素） */
+:root[data-theme='light'] {
+  --bg-color: #f1f5f9;
+  --surface-color: #ffffff;
+  --surface-hover: #f8fafc;
+
+  --primary: #0284c7;
+  --primary-hover: #0369a1;
+  --accent: #6d28d9;
+
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+
+  --border-color: rgba(0, 0, 0, 0.1);
+  --input-bg: #f8fafc;
+
+  --table-header-bg: rgba(0, 0, 0, 0.04);
+  --table-row-hover: rgba(0, 0, 0, 0.03);
+  --table-row-border: rgba(0, 0, 0, 0.06);
+
+  --navbar-bg: rgba(255, 255, 255, 0.95);
+  --nav-link-color: #64748b;
+  --nav-link-active: #0f172a;
+
+  --overlay-bg: rgba(0, 0, 0, 0.5);
+}
+
+/* ===================================================
+   全站基礎樣式
+   =================================================== */
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  /* 主題色套用到 html，讓所有子元素繼承 */
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: var(--bg-color);
+  color: var(--text-main);
+  font-family: var(--font-family);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  min-height: 100vh;
+}
+
+#app {
+  background-color: var(--bg-color);
+  min-height: 100vh;
+}
+
+/* ===================================================
+   通用卡片 (Premium Card)
+   =================================================== */
+
+.premium-card {
+  background-color: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.25s ease;
+}
+
+.premium-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+  border-color: rgba(56, 189, 248, 0.3);
+}
+
+/* ===================================================
+   按鈕
+   =================================================== */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  border: none;
+  font-family: var(--font-family);
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: white;
+  box-shadow: 0 4px 14px 0 rgba(139, 92, 246, 0.3);
+}
+
+.btn-primary:hover {
+  opacity: 0.9;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px 0 rgba(139, 92, 246, 0.4);
+}
+
+.btn-outline {
+  background: transparent;
+  color: var(--text-main);
+  border: 1px solid var(--border-color);
+}
+
+.btn-outline:hover {
+  background-color: var(--surface-hover);
+  border-color: var(--text-muted);
+}
+
+.btn:disabled,
+.btn.disabled-btn {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ===================================================
+   輸入框
+   =================================================== */
+
+.input-form {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: var(--input-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-main);
+  font-size: 1rem;
+  font-family: var(--font-family);
+  transition: border-color 0.2s ease, background-color 0.25s ease;
+}
+
+.input-form:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.2);
+}
+
+.input-form option {
+  background-color: var(--surface-color);
+  color: var(--text-main);
+}
+
+/* ===================================================
+   通用表格（排行榜、使用者列表等共用）
+   =================================================== */
+
+.list-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.list-header {
+  background-color: var(--table-header-bg);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.list-header th {
+  padding: 1rem 1.5rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  font-size: 0.875rem;
+  text-align: left;
+}
+
+.list-row {
+  border-bottom: 1px solid var(--table-row-border);
+  transition: background-color 0.2s;
+  color: var(--text-main);
+}
+
+.list-row:hover {
+  background-color: var(--table-row-hover);
+}
+
+.list-row td {
+  padding: 1rem 1.5rem;
+  color: var(--text-main);
+}
+
+/* ===================================================
+   Modal 遮罩
+   =================================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: var(--overlay-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+/* ===================================================
+   狀態 Badge
+   =================================================== */
+
+.status-badge {
+  padding: 0.2rem 0.6rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--surface-hover);
+  color: var(--text-muted);
+}
+
+.status-badge.active {
+  background: rgba(16, 185, 129, 0.15);
+  color: var(--success);
+}
+
+.status-badge.ended {
+  background: rgba(239, 68, 68, 0.1);
+  color: var(--danger);
+}
+
+/* ===================================================
+   載入 / 空狀態
+   =================================================== */
+
+.loading, .empty-state {
+  text-align: center;
+  padding: 4rem;
+  color: var(--text-muted);
+  font-size: 1.125rem;
+}
