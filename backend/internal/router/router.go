@@ -1,4 +1,4 @@
-package routes
+package router
 
 import (
 	"github.com/gin-gonic/gin"
@@ -12,7 +12,7 @@ import (
 // SetupRouter 掛載所有路由，接受各 Domain Handler 作為參數（DI）
 func SetupRouter(
 	r *gin.Engine,
-	authSvc *auth.Service,
+	authHdlr *auth.Handler,
 	userHdlr *user.Handler,
 	matchHdlr *match.Handler,
 	betHdlr *bet.Handler,
@@ -22,8 +22,8 @@ func SetupRouter(
 	// 1. 公開路由 (無須驗證)
 	authGroup := api.Group("/auth")
 	{
-		authGroup.POST("/register", authSvc.Register)
-		authGroup.POST("/login", authSvc.Login)
+		authGroup.POST("/register", authHdlr.Register)
+		authGroup.POST("/login", authHdlr.Login)
 	}
 
 	api.GET("/leaderboard", userHdlr.GetLeaderboard)

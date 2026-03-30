@@ -14,7 +14,7 @@ import (
 	"golang_world_cup/internal/infrastructure/database"
 	"golang_world_cup/internal/infrastructure/scheduler"
 	"golang_world_cup/internal/match"
-	"golang_world_cup/internal/routes"
+	"golang_world_cup/internal/router" // 更新 import
 	"golang_world_cup/internal/user"
 )
 
@@ -40,6 +40,7 @@ func main() {
 	userHdlr := user.NewHandler(userSvc)
 	matchHdlr := match.NewHandler(matchSvc)
 	betHdlr := bet.NewHandler(betSvc)
+	authHdlr := auth.NewHandler(authSvc) // 建立 auth.Handler
 
 	// 5. 啟動 Cron 排程
 	scheduler.InitScheduler(db)
@@ -58,7 +59,7 @@ func main() {
 	}))
 
 	// 7. 掛載路由 (依賴注入各 Handler)
-	routes.SetupRouter(r, authSvc, userHdlr, matchHdlr, betHdlr)
+	router.SetupRouter(r, authHdlr, userHdlr, matchHdlr, betHdlr) // 使用 router.SetupRouter
 
 	port := os.Getenv("PORT")
 	if port == "" {

@@ -4,6 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	"golang_world_cup/internal/common/response"
+	"golang_world_cup/internal/common/utils"
 )
 
 // Handler 負責處理 Bet 相關的 HTTP 請求
@@ -19,49 +22,47 @@ func NewHandler(svc Service) *Handler {
 func (h *Handler) PlaceBet(c *gin.Context) {
 	var input PlaceBetInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
-	userIDFloat, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Unauthorized"})
+	userID, ok := utils.GetUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
 		return
 	}
-	userID := uint(userIDFloat.(float64))
 
 	result, err := h.svc.PlaceBet(userID, input)
 	if err != nil {
 		switch err.Error() {
 		case "match not found":
-			c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
+			response.Error(c, http.StatusNotFound, err.Error())
 		case "match has already ended", "match has already started, betting is closed", "insufficient points or user not found":
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			response.Error(c, http.StatusBadRequest, err.Error())
 		default:
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			response.Error(c, http.StatusInternalServerError, err.Error())
 		}
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{
-		"message":   "Bet placed successfully",
-		"bet":       result.Bet,
-		"newPoints": result.NewPoints,
-	})
+	response.JSON(c, http.StatusCreated, "Bet placed successfully", result)
 }
 
 // GetUserBets 取得使用者所有下注紀錄
 func (h *Handler) GetUserBets(c *gin.Context) {
-	userIDFloat, _ := c.Get("userID")
-	userID := uint(userIDFloat.(float64))
+	userID, ok := utils.GetUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 
 	bets, err := h.svc.GetUserBets(userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch bets"})
+		response.Error(c, http.StatusInternalServerError, "Failed to fetch bets")
 		return
 	}
 	if bets == nil {
 		bets = []Bet{}
 	}
-	c.JSON(http.StatusOK, bets)
+	response.JSON(c, http.StatusOK, "Success", bets)
 }

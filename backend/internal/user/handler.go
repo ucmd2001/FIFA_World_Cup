@@ -4,6 +4,9 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+
+	"golang_world_cup/internal/common/response"
+	"golang_world_cup/internal/common/utils"
 )
 
 // Handler 負責處理 User 相關的 HTTP 請求
@@ -17,34 +20,39 @@ func NewHandler(svc Service) *Handler {
 
 // GetMe 取得當前使用者資訊
 func (h *Handler) GetMe(c *gin.Context) {
-	userIDFloat, _ := c.Get("userID")
-	userID := uint(userIDFloat.(float64))
+	userID, ok := utils.GetUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 
 	u, err := h.svc.GetMe(userID)
 	if err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "User not found"})
+		response.Error(c, http.StatusNotFound, "User not found")
 		return
 	}
-	c.JSON(http.StatusOK, u)
+	response.JSON(c, http.StatusOK, "Success", u)
 }
 
 // ClaimDaily 領取每日 1000 點
 func (h *Handler) ClaimDaily(c *gin.Context) {
-	userIDFloat, _ := c.Get("userID")
-	userID := uint(userIDFloat.(float64))
+	userID, ok := utils.GetUserID(c)
+	if !ok {
+		response.Error(c, http.StatusUnauthorized, "Unauthorized")
+		return
+	}
 
 	u, err := h.svc.ClaimDaily(userID)
 	if err != nil {
 		if err.Error() == "daily bonus already claimed today" {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			response.Error(c, http.StatusBadRequest, err.Error())
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			response.Error(c, http.StatusInternalServerError, err.Error())
 		}
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"message": "Daily bonus claimed successfully",
-		"points":  u.Points,
+	response.JSON(c, http.StatusOK, "Daily bonus claimed successfully", gin.H{
+		"points": u.Points,
 	})
 }
 
@@ -52,13 +60,13 @@ func (h *Handler) ClaimDaily(c *gin.Context) {
 func (h *Handler) GetAllUsers(c *gin.Context) {
 	users, err := h.svc.GetAllUsers()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch users"})
+		response.Error(c, http.StatusInternalServerError, "Failed to fetch users")
 		return
 	}
 
-	var response []gin.H
+	var data []gin.H
 	for _, u := range users {
-		response = append(response, gin.H{
+		data = append(data, gin.H{
 			"id":             u.ID,
 			"username":       u.Username,
 			"name":           u.Name,
@@ -70,14 +78,14 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 			"createdAt":      u.CreatedAt,
 		})
 	}
-	c.JSON(http.StatusOK, response)
+	response.JSON(c, http.StatusOK, "Success", data)
 }
 
 // GetLeaderboard 取得排行榜前 10 名
 func (h *Handler) GetLeaderboard(c *gin.Context) {
 	users, err := h.svc.GetLeaderboard(10)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to fetch leaderboard"})
+		response.Error(c, http.StatusInternalServerError, "Failed to fetch leaderboard")
 		return
 	}
 
@@ -89,15 +97,7 @@ func (h *Handler) GetLeaderboard(c *gin.Context) {
 			"points":   u.Points,
 		})
 	}
-	c.JSON(http.StatusOK, leaderboard)
-}
-
-// UpdateUserInput 定義可更新的欄位
-type UpdateUserInput struct {
-	Name   string `json:"name"`
-	Email  string `json:"email"`
-	Points *int   `json:"points"`
-	Role   string `json:"role"`
+	response.JSON(c, http.StatusOK, "Success", leaderboard)
 }
 
 // UpdateUser 管理員更新使用者資訊
@@ -105,7 +105,7 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 	userID := c.Param("id")
 	var input UpdateUserInput
 	if err := c.ShouldBindJSON(&input); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response.Error(c, http.StatusBadRequest, err.Error())
 		return
 	}
 
@@ -123,21 +123,20 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 		updates["role"] = input.Role
 	}
 
-	// 用 id 當作條件更新
 	updates["id"] = userID
 	if err := h.svc.UpdateUser(userID, updates); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		response.Error(c, http.StatusInternalServerError, err.Error())
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "User updated successfully"})
+	response.JSON(c, http.StatusOK, "User updated successfully", nil)
 }
 
 // DeleteUser 管理員刪除使用者
 func (h *Handler) DeleteUser(c *gin.Context) {
 	userID := c.Param("id")
 	if err := h.svc.DeleteUser(userID); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to delete user"})
+		response.Error(c, http.StatusInternalServerError, "Failed to delete user")
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"message": "User deleted successfully"})
+	response.JSON(c, http.StatusOK, "User deleted successfully", nil)
 }
