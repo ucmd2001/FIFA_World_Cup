@@ -3,6 +3,10 @@ package router
 import (
 	"github.com/gin-gonic/gin"
 
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
+
+	_ "golang_world_cup/docs" // 引入產生的 Swagger docs
 	"golang_world_cup/internal/auth"
 	"golang_world_cup/internal/bet"
 	"golang_world_cup/internal/match"
@@ -17,6 +21,9 @@ func SetupRouter(
 	matchHdlr *match.Handler,
 	betHdlr *bet.Handler,
 ) {
+	// Swagger 路由
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
+
 	api := r.Group("/api")
 
 	// 1. 公開路由 (無須驗證)

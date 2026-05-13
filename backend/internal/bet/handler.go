@@ -18,7 +18,20 @@ func NewHandler(svc Service) *Handler {
 	return &Handler{svc: svc}
 }
 
-// PlaceBet 使用者進行下注
+// PlaceBet godoc
+// @Summary      Place a bet
+// @Description  User places a bet on a match (A/B)
+// @Tags         Bet
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        input body PlaceBetInput true "Bet details"
+// @Success      201  {object}  response.Response
+// @Failure      400  {object}  response.ErrorResponse
+// @Failure      401  {object}  response.ErrorResponse
+// @Failure      404  {object}  response.ErrorResponse
+// @Failure      500  {object}  response.ErrorResponse
+// @Router       /bet [post]
 func (h *Handler) PlaceBet(c *gin.Context) {
 	var input PlaceBetInput
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -48,7 +61,17 @@ func (h *Handler) PlaceBet(c *gin.Context) {
 	response.JSON(c, http.StatusCreated, "Bet placed successfully", result)
 }
 
-// GetUserBets 取得使用者所有下注紀錄
+// GetUserBets godoc
+// @Summary      Get user bets
+// @Description  Returns all bets placed by the logged-in user
+// @Tags         Bet
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  response.Response
+// @Failure      401  {object}  response.ErrorResponse
+// @Failure      500  {object}  response.ErrorResponse
+// @Router       /bet [get]
 func (h *Handler) GetUserBets(c *gin.Context) {
 	userID, ok := utils.GetUserID(c)
 	if !ok {

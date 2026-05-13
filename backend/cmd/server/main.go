@@ -18,6 +18,15 @@ import (
 	"golang_world_cup/internal/user"
 )
 
+// @title           FIFA World Cup Betting System API
+// @version         1.0
+// @description     這是一個基於 DDD 架構開發的世足賽下注系統後端 API
+// @host            localhost:8080
+// @BasePath        /api
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
 func main() {
 	// 載入 .env 變數 (如有)
 	_ = godotenv.Load()
@@ -50,7 +59,7 @@ func main() {
 
 	// CORS Setup
 	r.Use(cors.New(cors.Config{
-		AllowOrigins:     []string{"http://localhost:5173", "http://127.0.0.1:5173"},
+		AllowAllOrigins:  true,
 		AllowMethods:     []string{"GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"},
 		AllowHeaders:     []string{"Origin", "Content-Type", "Authorization"},
 		ExposeHeaders:    []string{"Content-Length"},

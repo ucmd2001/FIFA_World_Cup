@@ -17,7 +17,17 @@ func NewHandler(svc *Service) *Handler {
 	return &Handler{svc: svc}
 }
 
-// Register 處理使用者註冊
+// Register godoc
+// @Summary      User Registration
+// @Description  Creates a new user account
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Param        input body RegisterInput true "Registration details"
+// @Success      201  {object}  response.Response
+// @Failure      400  {object}  response.ErrorResponse
+// @Failure      409  {object}  response.ErrorResponse
+// @Router       /auth/register [post]
 func (h *Handler) Register(c *gin.Context) {
 	var input RegisterInput
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -37,7 +47,17 @@ func (h *Handler) Register(c *gin.Context) {
 	response.JSON(c, http.StatusCreated, "Registration successful", nil)
 }
 
-// Login 處理使用者登入
+// Login godoc
+// @Summary      User Login
+// @Description  Authenticates user and returns JWT
+// @Tags         Auth
+// @Accept       json
+// @Produce      json
+// @Param        input body LoginInput true "Login credentials"
+// @Success      200
+// @Failure      400  {object}  response.ErrorResponse
+// @Failure      401  {object}  response.ErrorResponse
+// @Router       /auth/login [post]
 func (h *Handler) Login(c *gin.Context) {
 	var input LoginInput
 	if err := c.ShouldBindJSON(&input); err != nil {

@@ -17,7 +17,15 @@ func NewHandler(svc Service) *Handler {
 	return &Handler{svc: svc}
 }
 
-// GetMatches 取得所有賽事（含注池統計）
+// GetMatches godoc
+// @Summary      Get all matches
+// @Description  Returns list of matches including betting pool stats
+// @Tags         Match
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  response.Response
+// @Failure      500  {object}  response.ErrorResponse
+// @Router       /match [get]
 func (h *Handler) GetMatches(c *gin.Context) {
 	matches, err := h.svc.GetAllMatches()
 	if err != nil {
@@ -30,7 +38,18 @@ func (h *Handler) GetMatches(c *gin.Context) {
 	response.JSON(c, http.StatusOK, "Success", matches)
 }
 
-// CreateMatch 管理員新增賽事
+// CreateMatch godoc
+// @Summary      Create match
+// @Description  Admin creates a new match
+// @Tags         Match
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        input body CreateMatchInput true "Match details"
+// @Success      201  {object}  response.Response
+// @Failure      400  {object}  response.ErrorResponse
+// @Failure      500  {object}  response.ErrorResponse
+// @Router       /match [post]
 func (h *Handler) CreateMatch(c *gin.Context) {
 	var input CreateMatchInput
 	if err := c.ShouldBindJSON(&input); err != nil {
@@ -45,7 +64,20 @@ func (h *Handler) CreateMatch(c *gin.Context) {
 	response.JSON(c, http.StatusCreated, "Match created successfully", m)
 }
 
-// ResolveMatch 管理員結算賽果
+// ResolveMatch godoc
+// @Summary      Resolve match
+// @Description  Admin resolves a match result (A/B)
+// @Tags         Match
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id   path      int  true  "Match ID"
+// @Param        input body ResolveMatchInput true "Result A/B"
+// @Success      200  {object}  response.Response
+// @Failure      400  {object}  response.ErrorResponse
+// @Failure      404  {object}  response.ErrorResponse
+// @Failure      500  {object}  response.ErrorResponse
+// @Router       /match/{id}/resolve [put]
 func (h *Handler) ResolveMatch(c *gin.Context) {
 	matchID := c.Param("id")
 	var input ResolveMatchInput
@@ -66,7 +98,16 @@ func (h *Handler) ResolveMatch(c *gin.Context) {
 	response.JSON(c, http.StatusOK, "Match resolved successfully", nil)
 }
 
-// SyncMatches 從 football-data.org 同步賽程
+// SyncMatches godoc
+// @Summary      Sync matches
+// @Description  Admin manually updates matches from external API
+// @Tags         Match
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  response.Response
+// @Failure      500  {object}  response.ErrorResponse
+// @Router       /match/sync [post]
 func (h *Handler) SyncMatches(c *gin.Context) {
 	synced, err := h.svc.SyncMatches()
 	if err != nil {

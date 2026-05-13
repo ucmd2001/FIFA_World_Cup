@@ -18,7 +18,17 @@ func NewHandler(svc Service) *Handler {
 	return &Handler{svc: svc}
 }
 
-// GetMe 取得當前使用者資訊
+// GetMe godoc
+// @Summary      Get current user profile
+// @Description  Returns profile data of the logged-in user
+// @Tags         User
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  response.Response
+// @Failure      401  {object}  response.ErrorResponse
+// @Failure      404  {object}  response.ErrorResponse
+// @Router       /user/me [get]
 func (h *Handler) GetMe(c *gin.Context) {
 	userID, ok := utils.GetUserID(c)
 	if !ok {
@@ -34,7 +44,18 @@ func (h *Handler) GetMe(c *gin.Context) {
 	response.JSON(c, http.StatusOK, "Success", u)
 }
 
-// ClaimDaily 領取每日 1000 點
+// ClaimDaily godoc
+// @Summary      Claim daily points
+// @Description  Allows user to claim their 1000 daily points
+// @Tags         User
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  response.Response
+// @Failure      400  {object}  response.ErrorResponse
+// @Failure      401  {object}  response.ErrorResponse
+// @Failure      500  {object}  response.ErrorResponse
+// @Router       /user/daily [post]
 func (h *Handler) ClaimDaily(c *gin.Context) {
 	userID, ok := utils.GetUserID(c)
 	if !ok {
@@ -56,7 +77,16 @@ func (h *Handler) ClaimDaily(c *gin.Context) {
 	})
 }
 
-// GetAllUsers 取得所有使用者列表 (Admin Only)
+// GetAllUsers godoc
+// @Summary      Get all users
+// @Description  Returns list of all users, Admin only
+// @Tags         User
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  response.Response
+// @Failure      500  {object}  response.ErrorResponse
+// @Router       /user/all [get]
 func (h *Handler) GetAllUsers(c *gin.Context) {
 	users, err := h.svc.GetAllUsers()
 	if err != nil {
@@ -81,7 +111,15 @@ func (h *Handler) GetAllUsers(c *gin.Context) {
 	response.JSON(c, http.StatusOK, "Success", data)
 }
 
-// GetLeaderboard 取得排行榜前 10 名
+// GetLeaderboard godoc
+// @Summary      Get Leaderboard
+// @Description  Returns top 10 users by points
+// @Tags         User
+// @Accept       json
+// @Produce      json
+// @Success      200  {object}  response.Response
+// @Failure      500  {object}  response.ErrorResponse
+// @Router       /user/leaderboard [get]
 func (h *Handler) GetLeaderboard(c *gin.Context) {
 	users, err := h.svc.GetLeaderboard(10)
 	if err != nil {
@@ -100,7 +138,19 @@ func (h *Handler) GetLeaderboard(c *gin.Context) {
 	response.JSON(c, http.StatusOK, "Success", leaderboard)
 }
 
-// UpdateUser 管理員更新使用者資訊
+// UpdateUser godoc
+// @Summary      Update user
+// @Description  Update user details (Admin only)
+// @Tags         User
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id   path      int  true  "User ID"
+// @Param        input body UpdateUserInput true "Update details"
+// @Success      200  {object}  response.Response
+// @Failure      400  {object}  response.ErrorResponse
+// @Failure      500  {object}  response.ErrorResponse
+// @Router       /user/{id} [put]
 func (h *Handler) UpdateUser(c *gin.Context) {
 	userID := c.Param("id")
 	var input UpdateUserInput
@@ -131,7 +181,17 @@ func (h *Handler) UpdateUser(c *gin.Context) {
 	response.JSON(c, http.StatusOK, "User updated successfully", nil)
 }
 
-// DeleteUser 管理員刪除使用者
+// DeleteUser godoc
+// @Summary      Delete user
+// @Description  Delete user by ID (Admin only)
+// @Tags         User
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Param        id   path      int  true  "User ID"
+// @Success      200  {object}  response.Response
+// @Failure      500  {object}  response.ErrorResponse
+// @Router       /user/{id} [delete]
 func (h *Handler) DeleteUser(c *gin.Context) {
 	userID := c.Param("id")
 	if err := h.svc.DeleteUser(userID); err != nil {

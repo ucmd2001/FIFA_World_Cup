@@ -17,9 +17,16 @@ api.interceptors.request.use(
     (error) => Promise.reject(error)
 )
 
-// 回應攔截器：處理 401 未授權等情況
+// 回應攔截器：處理資料包裝與 401 未授權等情況
 api.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        // 自動解除後端的標準化回傳外殼 { code, message, data }
+        if (response.data && response.data.code !== undefined && response.data.data !== undefined) {
+            // 將內層的實際資料提升為 response.data
+            response.data = response.data.data
+        }
+        return response
+    },
     (error) => {
         if (error.response && error.response.status === 401) {
             localStorage.removeItem('token')
